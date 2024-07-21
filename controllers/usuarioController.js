@@ -67,3 +67,23 @@ exports.register = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+exports.getAllUsers = async (req, res) => {
+    try {
+      const usuarios = await sequelize.query(
+        'SELECT id, nome_completo, apelido FROM usuarios',
+        {
+          type: sequelize.QueryTypes.SELECT
+        }
+      );
+  
+      if (usuarios.length > 0) {
+        return res.status(200).json({ usuarios: usuarios });
+      } else {
+        return res.status(404).json({ message: 'Nenhum usuário encontrado' });
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
