@@ -32,38 +32,38 @@ CREATE TABLE historicos (
 
 -- Função para gerar token de login
 CREATE OR REPLACE FUNCTION gerar_token(
-    p_username VARCHAR,
-    p_senha VARCHAR
-)
-RETURNS VARCHAR AS $$
+    p_username VARCHAR(50),
+    p_senha VARCHAR(255)
+) RETURNS VARCHAR(255) AS $$
 DECLARE
-    v_count INT;
     v_user_id INT;
-    v_random_string VARCHAR;
-    p_token VARCHAR;
+    v_random_string VARCHAR(8);
+    p_token VARCHAR(255);
 BEGIN
-    -- Verificar se o login e senha correspondem a um usuário na tabela
-    SELECT COUNT(*), id INTO v_count, v_user_id
+    -- Tentar buscar o ID do usuário com o login e senha fornecidos
+    SELECT id INTO v_user_id
     FROM usuarios
-    WHERE username = p_username AND senha = p_senha;
+    WHERE username = p_username AND senha = p_senha
+    LIMIT 1;
 
-    -- Se o usuário for encontrado, gerar um token
-    IF v_count = 1 THEN
+    -- Se o usuário for encontrado (v_user_id não for nulo), gerar um token
+    IF v_user_id IS NOT NULL THEN
         -- Gerar uma string aleatória de 8 caracteres
-        v_random_string = SUBSTRING(MD5(RANDOM()::TEXT), 1, 8);
+        v_random_string := SUBSTRING(MD5(RANDOM()::TEXT), 1, 8);
 
         -- Criar o token no formato "username-hash"
-        p_token = CONCAT(p_username, '-', v_random_string);
+        p_token := p_username || '-' || v_random_string;
 
         -- Atualizar a tabela usuarios com o novo token
         UPDATE usuarios
         SET token = p_token
         WHERE id = v_user_id;
-
-        RETURN p_token;
     ELSE
         -- Se o usuário não for encontrado, retornar NULL
-        RETURN NULL;
+        p_token := NULL;
     END IF;
+
+    -- Retornar o token gerado ou NULL
+    RETURN p_token;
 END;
 $$ LANGUAGE plpgsql;

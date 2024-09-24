@@ -21,6 +21,9 @@ module.exports = (sequelize, DataTypes) => {
     apelido: {
       type: DataTypes.STRING,
     },
+    token: {
+      type: DataTypes.STRING,
+    },
   }, {
     tableName: 'usuarios',
     timestamps: false,

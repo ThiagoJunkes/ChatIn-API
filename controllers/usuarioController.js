@@ -5,19 +5,36 @@ exports.login = async (req, res) => {
 
     username = username.toLowerCase();
     try {
-    const [results] = await sequelize.query(
-        'SELECT id, username, senha, nome_completo, apelido FROM usuarios ' +
-        'WHERE username = :username AND senha = :senha;',
+      const [resultToken] = await sequelize.query(
+        'SELECT gerar_token(:username, :senha) AS token;',
         {
           replacements: { username, senha },
           type: sequelize.QueryTypes.SELECT
         }
       );
-    if (results) {
-        res.json({ message: 'Login realizado com sucesso', nome_completo: results.nome_completo, apelido: results.apelido });
-    } else {
-        res.status(401).json({ error: 'Usuario ou senha invalida!' });
-    }
+
+      if (!resultToken || !resultToken.token) {
+        return  res.status(401).json({ error: 'Usuario ou senha invalida!2' });
+      }
+
+      // console.log('token: ' + resultToken.token);
+
+      // Recupera o valor da variável de sessão @token e tipo de usuário
+      const [results] = await sequelize.query(
+        'SELECT token, username, nome_completo, apelido FROM usuarios WHERE username = :username;',
+        {
+          replacements: { username },
+          type: sequelize.QueryTypes.SELECT
+        }
+      );
+
+      const token = results.token;
+
+      if (token) {
+        res.json({ message: 'Login realizado com sucesso', nome_completo: results.nome_completo, apelido: results.apelido, token: results.token });
+      } else {
+        res.status(401).json({ error: 'Usuario ou senha invalida!1' });
+      }
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
