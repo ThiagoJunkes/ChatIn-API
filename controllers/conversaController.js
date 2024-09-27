@@ -18,7 +18,7 @@ exports.getConversasUsuario = async (req, res) => {
       'SELECT c.id, c.dt_criacao, user_to.apelido, user_to.nome_completo FROM conversas c ' +
       'JOIN usuarios user_to on user_to.id = c.fk_user_to ' +
       'JOIN usuarios user_from on user_from.id = c.fk_user_from ' +
-      'WHERE user_from.token = :token',
+      'WHERE user_to.token = :token OR user_from.token = :token;',
       {
         replacements: { token },
         type: sequelize.QueryTypes.SELECT
