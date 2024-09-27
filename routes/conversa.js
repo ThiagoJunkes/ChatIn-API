@@ -3,6 +3,6 @@ const router = express.Router();
 const conversaController = require('../controllers/conversaController.js');
 
 // Defina as rotas para conversas conforme necessário
-//router.get('/conversas', conversaController.getConversas);
+router.get('/usuario', conversaController.getConversasUsuario);
 
 module.exports = router;
