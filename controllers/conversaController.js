@@ -14,7 +14,7 @@ exports.getConversasUsuario = async (req, res) => {
   const token = req.query.token;
   console.log("Entrou");
   try {
-    const [conversas] = await sequelize.query(
+    const conversas = await sequelize.query(
       'SELECT c.id, c.dt_criacao, user_to.apelido, user_to.nome_completo FROM conversas c ' +
       'JOIN usuarios user_to on user_to.id = c.fk_user_to ' +
       'JOIN usuarios user_from on user_from.id = c.fk_user_from ' +
